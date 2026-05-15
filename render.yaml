@@ -1,0 +1,30 @@
+# Render.com — deploy full Amazon Ads MCP (secrets go in Render Dashboard, NOT in git)
+services:
+  - type: web
+    name: amazon-ads-mcp
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Render assigns PORT; server must listen on it
+    dockerCommand: sh -c "python -m amazon_ads_mcp.server --transport streamable-http --host 0.0.0.0 --port ${PORT:-8000}"
+    healthCheckPath: /health
+    envVars:
+      - key: AUTH_METHOD
+        value: direct
+      - key: TRANSPORT
+        value: streamable-http
+      - key: HOST
+        value: 0.0.0.0
+      - key: AMAZON_ADS_REGION
+        value: eu
+      - key: CODE_MODE
+        value: "true"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: AMAZON_ADS_TOKEN_PERSIST
+        value: "true"
+      - key: AMAZON_AD_API_PACKAGES
+        value: profiles,accounts-ads-accounts,reporting-version-3
+      # Add in Render Dashboard (Secret):
+      # AMAZON_AD_API_CLIENT_ID
+      # AMAZON_AD_API_CLIENT_SECRET
+      # AMAZON_AD_API_REFRESH_TOKEN
